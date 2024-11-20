@@ -177,6 +177,9 @@ def process_order(call):
     """, (order_id,))
     conn.commit() 
 
+    # Benachrichtigung an den Bar-Arbeiter senden
+    notify_bar_worker(f"Bestellung von {username}: {quantity} Kisten '{drink}' wurde als 'abgesendet' markiert.", username)
+
     bot.answer_callback_query(call.id, "✅ Bestellung wurde als 'abgesendet' markiert.")
     bot.send_message(chat_id, "✅ Bestellung wurde als 'abgesendet' markiert.")
 
@@ -302,6 +305,12 @@ def notify_nachschub(message):
     for (chat_id,) in cursor.fetchall():
         bot.send_message(chat_id, message)
         show_open_orders_for_nachschub(chat_id)  # Nachschub-Mitarbeiter bekommt offene Bestellungen angezeigt
+
+def notify_bar_worker(message, username):
+    cursor.execute("SELECT chat_id FROM sessions WHERE username = ? AND role = 'bar'", (username,))
+    for (chat_id,) in cursor.fetchall():
+        bot.send_message(chat_id, message)
+        show_bar_orders(chat_id, username)  # Bar-Arbeiter bekommt offene Bestellungen angezeigt
 
 # Logout-Kommando
 @bot.message_handler(commands=["logout"])
