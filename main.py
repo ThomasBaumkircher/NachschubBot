@@ -2,6 +2,7 @@ import json
 import os
 import sqlite3
 from telebot import TeleBot, types
+from time import sleep
 
 # Konfigurationsdatei laden
 CONFIG_FILE = "config.json"
@@ -76,13 +77,19 @@ def register_commands():
 @bot.message_handler(commands=["start"])
 def handle_start(message):
     chat_id = message.chat.id
-    bot.send_message(
-        chat_id,
-        "Willkommen beim Maturaball-Bot! Bitte logge dich ein.\n"
-        "Sende deinen Benutzernamen und das Passwort im Format:\n\n"
-        "`/login <Benutzername> <Passwort>`",
-        parse_mode="Markdown",
-    )
+    if not get_session(chat_id):
+        bot.send_message(
+            chat_id,
+            "Willkommen beim Maturaball-Bot! Bitte logge dich ein.\n"
+            "Sende deinen Benutzernamen und das Passwort im Format:\n\n"
+            "`/login <Benutzername> <Passwort>`",
+            parse_mode="Markdown",
+        )
+    elif get_session(chat_id)[1] == "nachschub":
+        show_open_orders_for_nachschub(chat_id)  # Nachschub-Mitarbeiter bekommt offene Bestellungen angezeigt
+
+    else:
+        show_drink_menu(chat_id, get_session(chat_id)[0])  # Getränkemenü anzeigen
 
 # Login-Kommando
 @bot.message_handler(commands=["login"])
@@ -125,16 +132,43 @@ def show_open_orders_for_nachschub(chat_id):
     rows = cursor.fetchall()
 
     if not rows:
-        bot.send_message(chat_id, "✅ Es gibt derzeit keine offenen Bestellungen für den Nachschub.")
+        bot.send_message(
+            chat_id,
+            "📋 *Keine offenen Bestellungen vorhanden.*",
+            parse_mode="Markdown",
+        )
         return
 
+    # Die usernames aus den rows extrahieren, damit die bestellungen gegliedert angezeigt werden können
+    usernames = set()
+    for _, username, _, _, _ in rows:
+        usernames.add(username)
+
+    bar_orders = {}
+    for username in usernames:
+        bar_orders[username] = []
+
     # Erstellen Sie eine Inline-Tastatur, um die Bestellungen anzuzeigen
-    markup = types.InlineKeyboardMarkup(row_width=1)
     for order_id, username, drink, quantity, status in rows:
         if status == "offen":
+            bar_orders[username].append({
+                "order_id": order_id,
+                "drink": drink,
+                "quantity": quantity,
+            })
+
+    markup = types.InlineKeyboardMarkup(row_width=1)
+
+    for user, orders in bar_orders.items():
+        markup.add(types.InlineKeyboardButton(
+            f"Bestellungen für {user}:",
+            callback_data=f"process_order:0"
+        ))
+
+        for order in orders:
             markup.add(types.InlineKeyboardButton(
-                f"Bestellung von {username}: {quantity} Kisten '{drink}'",
-                callback_data=f"process_order:{order_id}"
+                f"{order["quantity"]} Kisten '{order["drink"]}'",
+                callback_data=f"process_order:{order["order_id"]}"
             ))
 
     bot.send_message(
@@ -149,6 +183,10 @@ def show_open_orders_for_nachschub(chat_id):
 def process_order(call):
     chat_id = call.message.chat.id
     order_id = int(call.data.split(":")[1])
+
+    if order_id == 0:
+        bot.answer_callback_query(call.id, "❌ Dieser Knopf ist nicht zum drücken gedacht.")
+        return
 
     # Hole die Bestellung aus der Datenbank
     cursor.execute("""
@@ -181,7 +219,12 @@ def process_order(call):
     notify_bar_worker(f"Bestellung von {username}: {quantity} Kisten '{drink}' wurde als 'abgesendet' markiert.", username)
 
     bot.answer_callback_query(call.id, "✅ Bestellung wurde als 'abgesendet' markiert.")
-    bot.send_message(chat_id, "✅ Bestellung wurde als 'abgesendet' markiert.")
+    msg = bot.send_message(chat_id, "✅ Bestellung wurde als 'abgesendet' markiert.")
+
+    sleep(1)  # Warten, bevor die offenen Bestellungen aktualisiert werden
+
+    bot.delete_message(chat_id, msg.message_id)  # Löschen der alten Nachricht
+    bot.delete_message(chat_id, call.message.message_id)  # Löschen der alten Nachricht
 
     show_open_orders_for_nachschub(chat_id)  # Aktualisiere die offenen Bestellungen
 
@@ -204,7 +247,6 @@ def show_bar_orders(chat_id, username):
     rows = cursor.fetchall()
 
     if not rows:
-        bot.send_message(chat_id, "✅ Du hast keine offenen Bestellungen.")
         return
 
     markup = types.InlineKeyboardMarkup(row_width=1)
@@ -222,6 +264,9 @@ def show_bar_orders(chat_id, username):
         parse_mode="Markdown",
     )
 
+# Globale Variable für die Bestellungsmenge
+chat_info = {}
+
 # Getränkemenü anzeigen (optimierte Darstellung)
 def show_drink_menu(chat_id, username):
     session = get_session(chat_id)
@@ -237,15 +282,30 @@ def show_drink_menu(chat_id, username):
     for drink in assigned_drinks:
         markup.add(types.InlineKeyboardButton(drink, callback_data=f"order:{drink}"))
     
-    bot.send_message(
+    msg = bot.send_message(
         chat_id,
         "🍹 *Wähle ein Getränk aus:*",
         reply_markup=markup,
         parse_mode="Markdown",
     )
 
-# Globale Variable für die Bestellungsmenge
-awaiting_quantity = {}
+    open_orders = cursor.execute("""
+    SELECT drink, quantity FROM orders
+    WHERE username = ? AND status = 'offen'
+    """, (username,)).fetchall()
+
+    markup_open_orders = types.InlineKeyboardMarkup(row_width=2)
+    for drink, quantity in open_orders:
+        markup_open_orders.add(types.InlineKeyboardButton(f"{quantity} Kisten '{drink}'", callback_data=f"order:{drink}"))
+    
+    msg2 = bot.send_message(
+        chat_id,
+        "📋 *Deine offenen Bestellungen:*",
+        reply_markup=markup_open_orders,
+        parse_mode="Markdown",
+    )
+
+    chat_info[chat_id] = {"drink_menu_msg": msg, "open_order_msg": msg2}
 
 # Bestellung bearbeiten
 @bot.callback_query_handler(func=lambda call: call.data.startswith("order:"))
@@ -262,48 +322,63 @@ def handle_order(call):
     role = session[1]
 
     # Die Bestellung speichern, aber auf die Menge warten
-    awaiting_quantity[chat_id] = {"drink": drink, "username": username, "role": role}
-    bot.send_message(chat_id, f"Wie viele Kisten von '{drink}' möchtest du bestellen? (Bitte eine Zahl eingeben)")
+    msg = bot.send_message(chat_id, f"Wie viele Kisten von '{drink}' möchtest du bestellen? (Bitte eine Zahl eingeben)")
+    chat_info[chat_id] = {"drink": drink, "username": username, "role": role, "quantity_msg": msg, "drink_menu_msg": chat_info[chat_id]["drink_menu_msg"], "open_order_msg": chat_info[chat_id]["open_order_msg"]}
 
 # Empfang der Menge und Bestellung abschließen
-@bot.message_handler(func=lambda message: message.chat.id in awaiting_quantity)
+@bot.message_handler(func=lambda message: message.chat.id in chat_info and not message.text.startswith("/"))
 def handle_quantity(message):
     chat_id = message.chat.id
     quantity = message.text
 
+    msg = None
     # Überprüfen, ob die Eingabe eine gültige Zahl ist
     if not quantity.isdigit():
-        bot.send_message(chat_id, "❌ Bitte gib eine gültige Zahl ein.")
-        return
-
+        msg = bot.send_message(chat_id, "❌ Bitte gib eine gültige Zahl ein.")
     quantity = int(quantity)
-    order_info = awaiting_quantity.pop(chat_id, None)
 
+    order_info = chat_info.pop(chat_id, None)
     if not order_info:
-        bot.send_message(chat_id, "❌ Keine Bestellung gefunden.")
-        return
-
+        msg = bot.send_message(chat_id, "❌ Keine Bestellung gefunden.")
     drink = order_info["drink"]
     username = order_info["username"]
     role = order_info["role"]
 
-    # Bestellung in die Datenbank einfügen
-    cursor.execute("""
-    INSERT INTO orders (username, role, drink, quantity, status) 
-    VALUES (?, ?, ?, ?, 'offen')
-    """, (username, role, drink, quantity))
-    conn.commit()
+    if quantity < 0:
+        msg = bot.send_message(chat_id, "❌ Bitte gib eine positive Zahl ein.")
+    
+    elif quantity == 0:
+        msg = bot.send_message(chat_id, "❌ Die Bestellung kann nicht 0 Kisten enthalten.")
 
-    bot.send_message(chat_id, f"✅ Du hast {quantity} Kisten '{drink}' bestellt.")
+    else:
+        # Bestellung in die Datenbank einfügen
+        cursor.execute("""
+        INSERT INTO orders (username, role, drink, quantity, status) 
+        VALUES (?, ?, ?, ?, 'offen')
+        """, (username, role, drink, quantity))
+        conn.commit()
+
+        msg = bot.send_message(chat_id, f"✅ Du hast {quantity} Kisten '{drink}' bestellt.")
+
+    sleep(1)  # Warten, bevor die offenen Bestellungen aktualisiert werden
+
+    bot.delete_message(chat_id, msg.message_id)
+    bot.delete_message(chat_id, message.message_id)
+    bot.delete_message(chat_id, order_info["quantity_msg"].message_id)
+    bot.delete_message(chat_id, order_info["drink_menu_msg"].message_id)
+    bot.delete_message(chat_id, order_info["open_order_msg"].message_id)
 
     # Bestätigung der Bestellung
     notify_nachschub(f"Bestellung von {username}: {quantity} Kisten '{drink}'")
+    show_drink_menu(chat_id, username)  # Getränkemenü anzeigen
 
 # Nachschub benachrichtigen
 def notify_nachschub(message):
     cursor.execute("SELECT chat_id FROM sessions WHERE role = 'nachschub'")
     for (chat_id,) in cursor.fetchall():
-        bot.send_message(chat_id, message)
+        msg = bot.send_message(chat_id, message)
+        sleep(1)
+        bot.delete_message(chat_id, msg.message_id)
         show_open_orders_for_nachschub(chat_id)  # Nachschub-Mitarbeiter bekommt offene Bestellungen angezeigt
 
 def notify_bar_worker(message, username):
@@ -338,4 +413,4 @@ def handle_unknown_command(message):
 if __name__ == "__main__":
     print("Bot läuft...")
     register_commands()  # Befehle registrieren
-    bot.polling(none_stop=True)
+    bot.polling(none_stop=True, timeout=60)  # Bot starten
