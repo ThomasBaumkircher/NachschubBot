@@ -320,13 +320,18 @@ def handle_order(call):
     drink = call.data.split(":")[1]
     username = session[0]
     role = session[1]
-
+    
     # Die Bestellung speichern, aber auf die Menge warten
     msg = bot.send_message(chat_id, f"Wie oft möchtest du '{drink}' bestellen? (Bitte eine Zahl eingeben)")
     chat_info[chat_id] = {"drink": drink, "username": username, "role": role, "quantity_msg": msg, "drink_menu_msg": chat_info[chat_id]["drink_menu_msg"], "open_order_msg": chat_info[chat_id]["open_order_msg"]}
 
+
 # Empfang der Menge und Bestellung abschließen
-@bot.message_handler(func=lambda message: message.chat.id in chat_info and not message.text.startswith("/"))
+@bot.message_handler(func=lambda message: message.chat.id in chat_info and
+                     "drink" in chat_info[message.chat.id].keys() and
+                     "role" in chat_info[message.chat.id].keys() and
+                     "quantity_msg" in chat_info[message.chat.id].keys() and not
+                     message.text.startswith("/"))
 def handle_quantity(message):
     chat_id = message.chat.id
     quantity = message.text
@@ -335,7 +340,8 @@ def handle_quantity(message):
     # Überprüfen, ob die Eingabe eine gültige Zahl ist
     if not quantity.isdigit():
         msg = bot.send_message(chat_id, "❌ Bitte gib eine gültige Zahl ein.")
-    quantity = int(quantity)
+    else:
+        quantity = int(quantity)
 
     order_info = chat_info.pop(chat_id, None)
     if not order_info:
@@ -413,4 +419,4 @@ def handle_unknown_command(message):
 if __name__ == "__main__":
     print("Bot läuft...")
     register_commands()  # Befehle registrieren
-    bot.polling(none_stop=True, timeout=60)  # Bot starten
+    bot.polling(none_stop=True)  # Bot starten
