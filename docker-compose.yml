@@ -1,0 +1,14 @@
+services:
+  nachschub_bot:
+    image: python:3.11.1-slim
+    env_file: NachschubBot/.env
+    restart: always
+    build: ./NachschubBot
+    command: python3 main.py
+
+  ballkoenig_bot:
+    image: python:3.11.1-slim
+    env_file: BallkoenigBot/.env
+    restart: always
+    build: ./BallkoenigBot
+    command: python3 main.py

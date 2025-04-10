@@ -1,0 +1,18 @@
+[
+    {
+        "name": "Max Mustermann",
+        "geschlecht": "M"
+    },
+    {
+        "name": "Anna Beispiel",
+        "geschlecht": "W"
+    },
+    {
+        "name": "Peter Pan",
+        "geschlecht": "M"
+    },
+    {
+        "name": "Tinkerbell",
+        "geschlecht": "W"
+    }
+]
