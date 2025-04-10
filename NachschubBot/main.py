@@ -9,9 +9,18 @@ CONFIG_FILE = "config.json"
 with open(CONFIG_FILE, "r") as file:
     config = json.load(file)
 
+
 USERS = config["users"]
 DRINKS = config["drinks"]
 BARS = config["bars"]  # Zuordnung von Getränken zu Bars
+
+
+# Validierung der Konfigurationsdatei
+for bar in BARS.values():
+    for drink in bar:
+        if drink not in DRINKS:
+            raise ValueError(f"Bar '{bar}' in der Konfigurationsdatei hat ein nicht zugeordnetes Getränk: {drink}")
+
 
 # Initialisiere den Bot
 TOKEN = os.getenv("BOT_KEY")

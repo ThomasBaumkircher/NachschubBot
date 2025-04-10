@@ -166,3 +166,6 @@ BallkoenigBot/kandidaten.json
 
 NachschubBot/orders.db
 NachschubBot/config.json
+
+*.db
+*.json
