@@ -94,17 +94,7 @@
         "Hoefler Wein Bachus (0,7l)",
         "Frizzante (Flasche)",
         "Prosecco (Flasche)",
-        "Moet Chandon Ice Imperial (Flasche)",
-        "Coca Cola (Flasche?)",
-        "Lemon (Flasche?)",
-        "Energy Drink (Flasche?)",
-        "Malibu (Flasche?)",
-        "Gin (Flasche?)",
-        "Tonic Water (Flasche?)",
-        "Barcadi (Flasche?)",
-        "Whiskey (Flasche?)",
-        "Haxnspreizer (Flasche?)",
-        "Keine Ahnung was die Bar bestellen soll"
+        "Haxnspreizer (Flasche?)"
     ],
     "bars": {
         "BierSpritzerBar": [
@@ -130,19 +120,20 @@
             "K17 Wein 3-Trauben-Cuvee (0,7l)",
             "Hoefler Wein Sauvignon Blanc (0,7l)",
             "Hoefler Wein Grauburgunder (0,7l)",
-            "Hoefler Wein Bachus (0,7l)"
+            "Hoefler Wein Bachus (0,7l)",
+            "Roemerquelle Still (0,33l x 20Stk)",
+            "Roemerquelle prickelnd (0,33l x 20 Stk)",
+            "Roemerquelle Still (1l)",
+            "Peterquelle prickelnd (1l x 12 Stk)"
         ],
         "Sektbar": [
             "Sekt Henkel",
             "Frizzante (Flasche)",
             "Prosecco (Flasche)",
-            "Martini Asti (0,7l)",
-            "Moet Chandon Ice Imperial (Flasche)"
+            "Martini Asti (0,7l)"
         ],
         "Snackbar": [],
-        "Cocktailbar": [
-            "Keine Ahnung was die Bar bestellen soll"
-        ],
+        "Cocktailbar": [],
         "Boersenbar": [
             "Red Bull (0,25l x 24Stk)",
             "Orangensaft (1l)",
@@ -151,14 +142,7 @@
             "Jaegermeister (1l)",
             "Berliener Luft Mini (24Stk)",
             "Berliener Luft (0,7l)",
-            "Berliener Luft Eisbonbon (0,7l)",
-            "Coca Cola (Flasche?)",
-            "Lemon (Flasche?)",
-            "Energy Drink (Flasche?)",
-            "Malibu (Flasche?)",
-            "Gin (Flasche?)",
-            "Tonic Water (Flasche?)",
-            "Barcadi (Flasche?)"
+            "Berliener Luft Eisbonbon (0,7l)"
         ],
         "Stadlbar": [
             "Red Bull (0,25l x 24Stk)",
@@ -172,15 +156,7 @@
             "Spritzer Flascherl (0,3l x 24Stk)",
             "Berliener Luft Mini (24Stk)",
             "Berliener Luft (0,7l)",
-            "Berliener Luft Eisbonbon (0,7l)",
-            "Coca Cola (Flasche?)",
-            "Lemon (Flasche?)",
-            "Energy Drink (Flasche?)",
-            "Whiskey (Flasche?)",
-            "Malibu (Flasche?)",
-            "Gin (Flasche?)",
-            "Tonic Water (Flasche?)",
-            "Barcadi (Flasche?)"
+            "Berliener Luft Eisbonbon (0,7l)"
         ],
         "Disco": [
             "Red Bull (0,25l x 24Stk)",
@@ -190,15 +166,7 @@
             "Jaegermeister (1l)",
             "Berliener Luft Mini (24Stk)",
             "Berliener Luft (0,7l)",
-            "Berliener Luft Eisbonbon (0,7l)",
-            "Coca Cola (Flasche?)",
-            "Lemon (Flasche?)",
-            "Energy Drink (Flasche?)",
-            "Whiskey (Flasche?)",
-            "Malibu (Flasche?)",
-            "Gin (Flasche?)",
-            "Tonic Water (Flasche?)",
-            "Barcadi (Flasche?)"
+            "Berliener Luft Eisbonbon (0,7l)"
         ],
         "Shotbar": [
             "Jaegermeister Mini (60 Stk)",
