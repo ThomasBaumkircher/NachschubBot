@@ -116,7 +116,8 @@ def spendenbetrag_auswahl(message):
         spende_hinzufuegen(message)
         return
 
-    msg = bot.send_message(message.chat.id, "Wie oft wurde dieser Betrag gespendet?")
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    msg = bot.send_message(message.chat.id, "Wie oft wurde dieser Betrag gespendet?", reply_markup=markup)
     chat_message_ids.setdefault(message.chat.id, []).append(msg.message_id)
     bot.register_next_step_handler(msg, anzahl_spenden, betrag, punkte)
 
