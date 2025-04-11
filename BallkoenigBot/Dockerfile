@@ -23,3 +23,5 @@ RUN pip install -r requirements.txt
 
 # copy project
 COPY . /usr/bot/
+
+CMD ["python", "ball.py"]
