@@ -1,14 +1,16 @@
 services:
   nachschub_bot:
     image: python:3.11.1-slim
-    env_file: NachschubBot/.env
+    environment:
+      - API_KEY=${NACHSCHUB_API_KEY}
     restart: always
     build: ./NachschubBot
     command: python3 main.py
 
   ballkoenig_bot:
     image: python:3.11.1-slim
-    env_file: BallkoenigBot/.env
+    environment:
+      - API_KEY=${BALLKOENIG_API_KEY}
     restart: always
     build: ./BallkoenigBot
     command: python3 main.py
