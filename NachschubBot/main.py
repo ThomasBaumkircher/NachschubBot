@@ -372,7 +372,7 @@ def handle_quantity(message):
 
 # Nachschub benachrichtigen
 def notify_nachschub(message):
-    cursor = db_operation(get_sessions_by_username, 'nachschub')
+    cursor = db_operation(get_sessions_by_username, 'Nachschub')
     for (chat_id,) in cursor:
         msg = bot.send_message(chat_id, message)
         sleep(1)
