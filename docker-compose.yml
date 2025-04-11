@@ -5,7 +5,7 @@ services:
       - BOT_KEY=${NACHSCHUB_API_KEY}
     restart: always
     build: ./NachschubBot
-    command: python3 main.py
+    command: echo "Nachschub" && python3 main.py
 
   ballkoenig_bot:
     image: python:3.11.1-slim
@@ -13,4 +13,4 @@ services:
       - BOT_KEY=${BALLKOENIG_API_KEY}
     restart: always
     build: ./BallkoenigBot
-    command: python3 main.py
+    command: echo "Ballkoenig" && python3 main.py
