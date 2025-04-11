@@ -2,7 +2,7 @@ services:
   nachschub_bot:
     image: python:3.11.1-slim
     environment:
-      - API_KEY=${NACHSCHUB_API_KEY}
+      - BOT_KEY=${NACHSCHUB_API_KEY}
     restart: always
     build: ./NachschubBot
     command: python3 main.py
@@ -10,7 +10,7 @@ services:
   ballkoenig_bot:
     image: python:3.11.1-slim
     environment:
-      - API_KEY=${BALLKOENIG_API_KEY}
+      - BOT_KEY=${BALLKOENIG_API_KEY}
     restart: always
     build: ./BallkoenigBot
     command: python3 main.py
