@@ -406,6 +406,6 @@ def handle_unknown_command(message):
         )
 
 if __name__ == "__main__":
-    print("Bot läuft...")
+    print("Nachschub Bot läuft...")
     register_commands()
     bot.polling(none_stop=True)

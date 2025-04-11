@@ -187,5 +187,5 @@ def zurueck(message):
 
 
 if __name__ == "__main__":
-    print("Bot läuft...")
+    print("Ballkönig Bot läuft...")
     bot.polling(none_stop=True)
