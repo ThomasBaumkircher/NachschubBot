@@ -43,6 +43,10 @@
         "KaffeeKuchen": {
             "password": "Kennwort1",
             "role": "bar"
+        },
+        "Kellner": {
+            "password": "Kennwort1",
+            "role": "bar"
         }
     },
     "drinks": [
@@ -55,7 +59,7 @@
         "Puntigamer (0,33l x 24Stk)",
         "Berliener Luft Mini (24Stk)",
         "Martini Asti (0,7l)",
-        "Sekt Henkel",
+        "Sekt Henkel (Flasche)",
         "Berliener Luft (0,7l)",
         "Berliener Luft Eisbonbon (0,7l)",
         "Absolut Vodka (0,7l)",
@@ -83,7 +87,7 @@
         "Monin Erdbeer (0,7l)",
         "Monin Maracuja (0,7l)",
         "Monin Violett (0,7l)",
-        "Leitner Wein Muskateller (0,7l)",
+        "Leitner Wein Gelber Muskateller (0,7l)",
         "Leitner Wein Zweigelt (0,7l)",
         "Leitner Wein Urbanus (0,7l)",
         "K17 Wein Welschriesling (0,7l)",
@@ -94,7 +98,8 @@
         "Hoefler Wein Bachus (0,7l)",
         "Frizzante (Flasche)",
         "Prosecco (Flasche)",
-        "Haxnspreizer (Flasche?)"
+        "Dsire (0,25l x 20Stk)",
+        "Spritzer (Fass)"
     ],
     "bars": {
         "BierSpritzerBar": [
@@ -109,10 +114,12 @@
             "Eistee Pfirsich (0,33l x 24Stk)",
             "Almdudler (0,33l x 24Stk)",
             "Frucade (0,33l x 24Stk)",
-            "Spritzer Flascherl (0,3l x 24Stk)"
+            "Spritzer (Fass)",
+            "Roemerquelle Still (0,33l x 20Stk)",
+            "Roemerquelle prickelnd (0,33l x 20 Stk)"
         ],
         "Weinbar": [
-            "Leitner Wein Muskateller (0,7l)",
+            "Leitner Wein Gelber Muskateller (0,7l)",
             "Leitner Wein Zweigelt (0,7l)",
             "Leitner Wein Urbanus (0,7l)",
             "K17 Wein Welschriesling (0,7l)",
@@ -123,11 +130,10 @@
             "Hoefler Wein Bachus (0,7l)",
             "Roemerquelle Still (0,33l x 20Stk)",
             "Roemerquelle prickelnd (0,33l x 20 Stk)",
-            "Roemerquelle Still (1l)",
             "Peterquelle prickelnd (1l x 12 Stk)"
         ],
         "Sektbar": [
-            "Sekt Henkel",
+            "Sekt Henkel (Flasche)",
             "Frizzante (Flasche)",
             "Prosecco (Flasche)",
             "Martini Asti (0,7l)"
@@ -135,52 +141,49 @@
         "Snackbar": [],
         "Cocktailbar": [],
         "Boersenbar": [
-            "Red Bull (0,25l x 24Stk)",
-            "Orangensaft (1l)",
-            "Absolut Vodka (0,7l)",
-            "Jaegermeister Mini (60 Stk)",
-            "Jaegermeister (1l)",
-            "Berliener Luft Mini (24Stk)",
-            "Berliener Luft (0,7l)",
-            "Berliener Luft Eisbonbon (0,7l)"
+            "Red Bull (0,25l x 24Stk)"
         ],
         "Stadlbar": [
             "Red Bull (0,25l x 24Stk)",
-            "Orangensaft (1l)",
             "Roemerquelle Still (0,33l x 20Stk)",
             "Roemerquelle prickelnd (0,33l x 20 Stk)",
-            "Absolut Vodka (0,7l)",
-            "Jaegermeister Mini (60 Stk)",
-            "Jaegermeister (1l)",
             "Puntigamer (0,33l x 24Stk)",
             "Spritzer Flascherl (0,3l x 24Stk)",
-            "Berliener Luft Mini (24Stk)",
-            "Berliener Luft (0,7l)",
-            "Berliener Luft Eisbonbon (0,7l)"
+            "Dsire (0,25l x 20Stk)"
         ],
         "Disco": [
-            "Red Bull (0,25l x 24Stk)",
-            "Orangensaft (1l)",
-            "Absolut Vodka (0,7l)",
-            "Jaegermeister Mini (60 Stk)",
-            "Jaegermeister (1l)",
-            "Berliener Luft Mini (24Stk)",
-            "Berliener Luft (0,7l)",
-            "Berliener Luft Eisbonbon (0,7l)"
+            "Red Bull (0,25l x 24Stk)"
         ],
         "Shotbar": [
-            "Jaegermeister Mini (60 Stk)",
             "Jaegermeister (1l)",
             "Klopfer Mix (Box)",
             "Berliener Luft Mini (24Stk)",
             "Berliener Luft (0,7l)",
             "Berliener Luft Eisbonbon (0,7l)",
             "Tequilla (0,7l)",
-            "Haxnspreizer (Flasche?)"
+            "Absolut Vodka (0,7l)",
+            "Sourz Gruen/Apple (Flasche)",
+            "Sourz Rot/Raspberry (Flasche)"
         ],
         "KaffeeKuchen": [
             "Roemerquelle Still (0,33l x 20Stk)",
             "Roemerquelle prickelnd (0,33l x 20 Stk)"
+        ],
+        "Kellner": [
+            "Coca Cola (0,33l x 24STK)",
+            "Eistee Pfirsich (0,33l x 24Stk)",
+            "Almdudler (0,33l x 24Stk)",
+            "Frucade (0,33l x 24Stk)",
+            "Roemerquelle Still (0,33l x 20Stk)",
+            "Roemerquelle prickelnd (0,33l x 20 Stk)",
+            "Roemerquelle prickelnd (0,75l x 12 Stk)",
+            "Spritzer Flascherl (0,3l x 24Stk)",
+            "Puntigamer (0,33l x 24Stk)",
+            "Goesser Natur alkoholfrei (0,33l)",
+            "Leitner Wein Gelber Muskateller (0,7l)",
+            "Hoefler Wein Sauvignon Blanc (0,7l)",
+            "K17 Wein Weissburgunder (0,7l)",
+            "Leitner Wein Zweigelt (0,7l)"
         ]
     }
 }
