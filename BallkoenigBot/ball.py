@@ -10,19 +10,19 @@ bot = telebot.TeleBot(BOT_TOKEN)
 # Dictionary to store message IDs for each chat
 chat_message_ids = {}
 
+
 def clear_chat_messages(chat_id):
     if chat_id in chat_message_ids:
         for message_id in chat_message_ids[chat_id]:
             try:
                 bot.delete_message(chat_id, message_id)
             except telebot.apihelper.ApiException as e:
-                if e.error_code != 400:  # Ignore "Bad Request" (message already deleted)
+                if e.error_code != 400:  # Ignore "Bad Request"
                     print(f"Error deleting message {message_id}: {e}")
         del chat_message_ids[chat_id]
 
 
 def db_operation(func, *args):
-    """Handles database connection and cursor for each operation."""
     conn = sqlite3.connect('ballkoenig.db')
     cursor = conn.cursor()
     try:
@@ -31,7 +31,7 @@ def db_operation(func, *args):
         return result
     except Exception as e:
         print(f"Database error: {e}")
-        conn.rollback()  # Rollback changes in case of error
+        conn.rollback()
         return None
     finally:
         cursor.close()
@@ -68,7 +68,7 @@ def get_top_kandidaten(cursor, geschlecht, limit=5):
     return cursor.fetchall()
 
 
-# JSON-Datei laden und Kandidaten in die Datenbank einfügen, falls noch nicht vorhanden
+# JSON-Datei laden and database initialization
 try:
     with open('kandidaten.json', 'r', encoding='utf-8') as f:
         kandidaten_data = json.load(f)
@@ -116,8 +116,7 @@ def spendenbetrag_auswahl(message):
         spende_hinzufuegen(message)
         return
 
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    msg = bot.send_message(message.chat.id, "Wie oft wurde dieser Betrag gespendet?", reply_markup=markup)
+    msg = bot.send_message(message.chat.id, "Wie oft wurde dieser Betrag gespendet?")
     chat_message_ids.setdefault(message.chat.id, []).append(msg.message_id)
     bot.register_next_step_handler(msg, anzahl_spenden, betrag, punkte)
 
@@ -140,17 +139,38 @@ def anzahl_spenden(message, betrag, punkte):
     with open('kandidaten.json', 'r', encoding='utf-8') as f:
         kandidaten = json.load(f)
 
+    msg = bot.send_message(message.chat.id, "Geben Sie den Namen des Kandidaten ein (oder einen Teil davon):", reply_markup=types.ReplyKeyboardRemove())
+    chat_message_ids.setdefault(message.chat.id, []).append(msg.message_id)
+    bot.register_next_step_handler(msg, kandidat_auswahl, anzahl, punkte, kandidaten)
+
+
+def kandidat_auswahl(message, anzahl, punkte, kandidaten):
+    if message.text == "Abbrechen":
+        start(message)
+        return
+
+    entered_name = message.text.lower()
+    matching_kandidaten = [kandidat for kandidat in kandidaten if entered_name in kandidat['name'].lower()]
+
+    if not matching_kandidaten:
+        msg = bot.send_message(message.chat.id, "Kein Kandidat gefunden. Bitte versuchen Sie es erneut.")
+        chat_message_ids.setdefault(message.chat.id, []).append(msg.message_id)
+        bot.register_next_step_handler(msg, kandidat_auswahl, anzahl, punkte, kandidaten)
+        return
+
+
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
-    for kandidat in kandidaten:
+    for kandidat in matching_kandidaten:
         markup.add(types.KeyboardButton(kandidat['name']))
     markup.add(types.KeyboardButton("Abbrechen"))
 
-    msg = bot.send_message(message.chat.id, "Für welchen Kandidaten ist die Spende?", reply_markup=markup)
+    msg = bot.send_message(message.chat.id, "Wählen Sie den Kandidaten:", reply_markup=markup)
     chat_message_ids.setdefault(message.chat.id, []).append(msg.message_id)
-    bot.register_next_step_handler(msg, kandidat_auswahl, anzahl, punkte)
+    bot.register_next_step_handler(msg, kandidat_auswahl_from_list, anzahl, punkte)
 
 
-def kandidat_auswahl(message, anzahl, punkte):
+
+def kandidat_auswahl_from_list(message, anzahl, punkte): # Handler for list selection
     if message.text == "Abbrechen":
         start(message)
         return
@@ -158,15 +178,17 @@ def kandidat_auswahl(message, anzahl, punkte):
     name = message.text
     with open('kandidaten.json', 'r', encoding='utf-8') as f:
         kandidaten = json.load(f)
+
     if not any(kandidat['name'] == name for kandidat in kandidaten):
         bot.send_message(message.chat.id, "Ungültiger Kandidat. Bitte wählen Sie einen Kandidaten aus der Liste.")
-        spende_hinzufuegen(message)
+        spende_hinzufuegen(message) # Restart if invalid
         return
 
     db_operation(update_punkte, name, anzahl * punkte)
     msg = bot.send_message(message.chat.id, f"Spende für {name} erfolgreich hinzugefügt!", reply_markup=types.ReplyKeyboardRemove())
     chat_message_ids.setdefault(message.chat.id, []).append(msg.message_id)
     start(message)
+
 
 
 @bot.message_handler(func=lambda message: message.text == "Top 5 anzeigen")
